@@ -1,4 +1,4 @@
-# Political domain representations Grokipedia vs. english Wikipedia
+# Political domain representations in Grokipedia vs. english Wikipedia
 
 This repository implements a comparative analysis methodology for assessing political representation across two online encyclopedic platforms, **Wikipedia** and **Grokipedia**. Given the significant influence these platforms have on public opinions and their utilization in training large language models, our study seeks to disaggregate the nuanced differences in political coverage between them. Through systematic comparisons, we aim to uncover the underlying mechanisms of divergence in portrayals of political actors and events. 
 
