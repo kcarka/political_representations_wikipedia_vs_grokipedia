@@ -2,6 +2,17 @@
 
 This repository implements a comparative analysis methodology for assessing political representation across two online encyclopedic platforms, **Wikipedia** and **Grokipedia**. Given the significant influence these platforms have on public opinions and their utilization in training large language models, our study seeks to disaggregate the nuanced differences in political coverage between them. Through systematic comparisons, we aim to uncover the underlying mechanisms of divergence in portrayals of political actors and events. 
 
+## Table of Contents
+- [Research Questions](#research-questions)
+- [Modules Overview](#modules-overview)
+  - [Data Selection and Preparation](#1-data-selection-and-preparation)
+  - [Bias Localization Module](#2-bias-localization-module)
+  - [Type Consistency Module](#3-type-consistency-module)
+  - [Reference Module](#4-reference-module)
+  - [Statistical Validation](#5-statistical-validation)
+  - [Synthesis and Research Question Mapping](#6-synthesis-and-research-question-mapping)
+- [Installation Instructions](#installation-instructions)
+
 ## Research Questions
 
 Our analysis focuses on three key research questions that guide the exploration of content differences between Grokipedia and Wikipedia:
@@ -49,4 +60,59 @@ The implementation consists of a modular pipeline designed to facilitate detaile
 - **Task:** Combine insights from all analytical modules to comprehensively address the research questions.
 - **Functions:**
   - Aggregate findings to see where divergences primarily arise, assess structural consistency, and clarify sourcing influences.
+ 
 
+## Installation Instructions
+
+Follow these steps to set up a virtual environment and install the required packages for this project:
+
+### Step 1: Clone the Repository
+
+First, clone the repository to your local machine:
+
+```bash
+git clone <repository_url>
+cd <repository_directory>
+```
+
+### Step 2: Create a Virtual Environment
+
+Next, create a virtual environment using the `venv` module. This helps to manage dependencies without interfering with your system Python installation:
+
+```bash
+python -m venv venv
+```
+
+This command creates a new directory called `venv` in your project folder.
+
+### Step 3: Activate the Virtual Environment
+
+Activate the virtual environment with the following command, depending on your operating system:
+
+- **On Windows:**
+  ```bash
+  venv\Scripts\activate
+  ```
+
+- **On macOS/Linux:**
+  ```bash
+  source venv/bin/activate
+  ```
+
+### Step 4: Install Required Packages
+
+Once the virtual environment is activated, install the necessary packages from the `requirements.txt` file:
+
+```bash
+pip install -r requirements.txt
+```
+
+### Step 5: Deactivate the Virtual Environment (Optional)
+
+When you are finished working in the virtual environment, you can deactivate it by running:
+
+```bash
+deactivate
+```
+
+This returns you to your system Python environment.
