@@ -1,6 +1,7 @@
 from typing import Any, Dict, List, Optional
 
 from bs4 import BeautifulSoup, Tag
+from pipeline.text_clean import clean_span_text
 
 
 def parse_grokipedia_article(html: str) -> Dict[str, Any]:
@@ -21,7 +22,7 @@ def parse_grokipedia_article(html: str) -> Dict[str, Any]:
     
     for h2_idx, h2 in enumerate(h2_tags):
         section_title = h2.get_text(" ", strip=True)
-        print(f"\n[parse] Section (h2): {section_title}")
+        # print(f"\n[parse] Section (h2): {section_title}")
         
         section_spans: List[str] = []
         subsections: List[Dict[str, Any]] = []
@@ -45,7 +46,7 @@ def parse_grokipedia_article(html: str) -> Dict[str, Any]:
                 if current_sub:
                     subsections.append(current_sub)
                 subsection_title = sib.get_text(" ", strip=True)
-                print(f"[parse]   Subsection (h3): {subsection_title}")
+                # print(f"[parse]   Subsection (h3): {subsection_title}")
                 current_sub = {
                     "title": subsection_title,
                     "spans": [],
@@ -55,8 +56,9 @@ def parse_grokipedia_article(html: str) -> Dict[str, Any]:
             # If span with mb-4 class, it's a content block
             if sib.name == "span" and "mb-4" in sib.get("class", []):
                 text = sib.get_text(" ", strip=True)
+                text = clean_span_text(text)
                 if text:
-                    print(f"[parse]     span text (first 80 chars): {text[:80]}")
+                    # print(f"[parse]     span text (first 80 chars): {text[:80]}")
                     if current_sub is not None:
                         current_sub["spans"].append(text)
                     else:
