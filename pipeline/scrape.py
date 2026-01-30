@@ -2,7 +2,7 @@ import json
 import re
 import time
 from dataclasses import dataclass, asdict
-from typing import List, Dict, Optional, Tuple
+from typing import List, Dict, Optional
 
 import requests
 from bs4 import BeautifulSoup
