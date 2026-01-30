@@ -6,7 +6,7 @@ Structure:
 - h2 headings define top-level sections (e.g., Early life and education, Business career)
 - h3 headings define subsections (e.g., Real estate, Licensing the Trump name)
 - Text is in <p> tags between headings
-- References in <ol class="references">
+- References extracted from inline <span class="reference-text"> elements
 """
 
 from typing import Any, Dict, List
@@ -21,7 +21,7 @@ def parse_wikipedia_article(html: str) -> Dict[str, Any]:
     - h3 headings define subsections (wrapped in div.mw-heading mw-heading3)
     - h4 headings define sub-subsections (wrapped in div.mw-heading mw-heading4)
     - Paragraph text appears after headings as siblings
-    - References reside in <ol class="references">
+    - References extracted from inline <span class="reference-text"> elements
     """
     soup = BeautifulSoup(html, "html.parser")
 
