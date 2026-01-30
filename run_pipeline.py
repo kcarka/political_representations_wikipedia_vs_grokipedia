@@ -28,6 +28,12 @@ def main():
     wiki_urls = read_lines(args.wiki_urls)
     grok_urls = read_lines(args.grok_urls)
 
+    if len(wiki_urls) != len(grok_urls):
+        print(
+            f"Warning: number of Wikipedia URLs ({len(wiki_urls)}) does not match "
+            f"number of Grokipedia URLs ({len(grok_urls)}). "
+            "Results may be misaligned if you assume positional pairing."
+        )
     print(f"Downloading {len(wiki_urls)} Wikipedia pages and {len(grok_urls)} Grokipedia pages...")
     
     # Download raw HTML for both sources
