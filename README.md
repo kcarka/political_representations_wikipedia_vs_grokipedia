@@ -12,6 +12,7 @@ This repository implements a comparative analysis methodology for assessing poli
   - [Statistical Validation](#5-statistical-validation)
   - [Synthesis and Research Question Mapping](#6-synthesis-and-research-question-mapping)
 - [Installation Instructions](#installation-instructions)
+ - [Pipeline Quickstart](#pipeline-quickstart)
 
 ## Research Questions
 
@@ -116,3 +117,36 @@ deactivate
 ```
 
 This returns you to your system Python environment.
+
+## Pipeline Quickstart
+
+The initial data pipeline implements:
+- Scraping matched article pairs from provided Wikipedia and Grokipedia URLs
+- Extracting main text content and cited references
+- Cleaning text (lowercasing, stopword removal, lemmatization via `nltk`)
+- Mapping reference URLs to media domains and example bias/factuality scores
+
+### Configure seeds
+
+Provide matched URL pairs by line order:
+- Line N in [data/seeds/wikipedia_urls.txt](data/seeds/wikipedia_urls.txt) pairs with line N in [data/seeds/grokipedia_urls.txt](data/seeds/grokipedia_urls.txt)
+- Example:
+  - Wikipedia line 1: `https://en.wikipedia.org/wiki/Donald_Trump`
+  - Grokipedia line 1: `https://grokipedia.com/page/Donald_Trump`
+- Optional: extend media score mappings at [data/media_scores.json](data/media_scores.json)
+
+### Run the pipeline
+
+```bash
+source venv/bin/activate  # macOS/Linux
+pip install -r requirements.txt
+python run_pipeline.py
+```
+
+Outputs will be saved to `data/outputs/`:
+- `pairs.json` — matched article pairs with cleaned text and annotated references
+
+Notes:
+- Wikipedia scraping uses direct page fetch plus MediaWiki API fallbacks to extract article text from `mw-parser-output`.
+- Grokipedia scraping is generic HTML extraction. If Grokipedia has a specific structure, update `pipeline/scrape.py` accordingly.
+- Pairs with empty text in either article are skipped.
