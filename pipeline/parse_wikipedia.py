@@ -9,7 +9,7 @@ Structure:
 - References in <ol class="references">
 """
 
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List
 from bs4 import BeautifulSoup, Tag
 from pipeline.text_clean import clean_span_text
 
