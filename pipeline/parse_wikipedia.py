@@ -140,31 +140,39 @@ def parse_wikipedia_article(html: str) -> Dict[str, Any]:
     }
 
 
-def _extract_references(soup: BeautifulSoup) -> List[str]:
+def _extract_references(soup: BeautifulSoup) -> List[Dict[str, str]]:
     """
-    Extract references from Wikipedia's <ol class="references"> list.
-    Returns list of reference URLs.
+    Extract references from Wikipedia's inline <span class="reference-text"> elements.
+    These are embedded within the content container throughout the article.
+    Returns list of dicts with "url" and "text" keys, matching Grokipedia format.
     """
-    refs: List[str] = []
+    refs: List[Dict[str, str]] = []
     
-    # Try to find references in <ol class="references">
-    ref_list = soup.find("ol", class_="references")
-    if ref_list:
-        for li in ref_list.find_all("li", recursive=False):
-            # Extract all links from this reference
-            for a in li.find_all("a", href=True):
-                href = a["href"]
-                if href.startswith("http://") or href.startswith("https://"):
-                    refs.append(href)
-        print(f"[parse_wiki] Found {len(refs)} references from ol.references")
+    # Find main content container
+    content_container = soup.find("div", class_="mw-content-container")
+    if not content_container:
+        print("[parse_wiki] Warning: mw-content-container not found for reference extraction")
         return refs
     
-    # Fallback: search for any links in the page (less precise)
-    print("[parse_wiki] Warning: ol.references not found, using fallback link extraction")
-    for a in soup.find_all("a", href=True):
-        href = a["href"]
-        if href.startswith("http://") or href.startswith("https://"):
-            refs.append(href)
+    # Find all inline reference spans
+    reference_spans = content_container.find_all("span", class_="reference-text")
     
-    print(f"[parse_wiki] Found {len(refs)} references (fallback)")
+    if not reference_spans:
+        print("[parse_wiki] Warning: No reference-text spans found")
+        return refs
+    
+    for span in reference_spans:
+        # Look for external URL in <a rel="nofollow" class="external text">
+        external_link = span.find("a", class_="external text", rel="nofollow")
+        href = external_link.get("href") if external_link else None
+        
+        # Get full citation text from the span
+        text = span.get_text(" ", strip=True)
+        
+        refs.append({
+            "url": href,
+            "text": text,
+        })
+    
+    print(f"[parse_wiki] Found {len(refs)} references from reference-text spans")
     return refs
