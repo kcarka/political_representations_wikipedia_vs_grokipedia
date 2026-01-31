@@ -205,6 +205,10 @@ cython_debug/
 marimo/_static/
 marimo/_lsp/
 __marimo__/
+
+# Project outputs
+data/outputs/*.html
+data/outputs/*.json
 *.zip
 /data/CongressRecord/vocabulary
 /data/CongressRecord/phrase_partisanship

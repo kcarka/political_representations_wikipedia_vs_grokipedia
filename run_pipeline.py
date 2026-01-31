@@ -6,6 +6,7 @@ from urllib.parse import urlparse
 
 from pipeline.scrape import scrape_wikipedia_from_urls, scrape_grokipedia_from_urls
 from pipeline.parse_grokipedia import parse_grokipedia_article
+from pipeline.parse_wikipedia import parse_wikipedia_article
 
 
 def read_lines(path: str) -> List[str]:
@@ -27,14 +28,21 @@ def main():
     wiki_urls = read_lines(args.wiki_urls)
     grok_urls = read_lines(args.grok_urls)
 
+    if len(wiki_urls) != len(grok_urls):
+        print(
+            f"Warning: number of Wikipedia URLs ({len(wiki_urls)}) does not match "
+            f"number of Grokipedia URLs ({len(grok_urls)}). "
+            "Results may be misaligned if you assume positional pairing."
+        )
     print(f"Downloading {len(wiki_urls)} Wikipedia pages and {len(grok_urls)} Grokipedia pages...")
     
     # Download raw HTML for both sources
     jobs = [
-        ("Wikipedia", wiki_urls, scrape_wikipedia_from_urls, "wikipedia_raw_", False),
+        ("Wikipedia", wiki_urls, scrape_wikipedia_from_urls, "wikipedia_raw_", True),
         ("Grokipedia", grok_urls, scrape_grokipedia_from_urls, "grokipedia_raw_", True),
     ]
 
+    parsed_wiki: List[dict] = []
     parsed_grok: List[dict] = []
 
     for source_name, url_list, scraper, prefix, do_parse in jobs:
@@ -53,11 +61,48 @@ def main():
                 f.write(raw_html)
             print(f"  Saved to {out_path} (len={len(raw_html)})")
 
-            # Parse Grokipedia content if requested
-            if do_parse and source_name == "Grokipedia":
-                parsed = parse_grokipedia_article(raw_html)
-                parsed["url"] = url
-                parsed_grok.append(parsed)
+            # Parse content if requested
+            if do_parse:
+                if source_name == "Wikipedia":
+                    parsed = parse_wikipedia_article(raw_html)
+                    parsed["url"] = url
+                    parsed_wiki.append(parsed)
+                elif source_name == "Grokipedia":
+                    parsed = parse_grokipedia_article(raw_html)
+                    parsed["url"] = url
+                    parsed_grok.append(parsed)
+
+    # Save parsed Wikipedia JSON if any
+    if parsed_wiki:
+        parsed_path = os.path.join(args.out_dir, "wikipedia_parsed.json")
+        with open(parsed_path, "w", encoding="utf-8") as f:
+            json.dump(parsed_wiki, f, ensure_ascii=False, indent=2)
+        print(f"Saved parsed Wikipedia JSON to {parsed_path}")
+
+        # Also write paragraphs-only files per personality (derived from URL)
+        for item in parsed_wiki:
+            url = item.get("url", "")
+            slug = ""
+            try:
+                path = urlparse(url).path.rstrip("/")
+                slug = path.split("/")[-1] if path else "page"
+            except Exception:
+                slug = "page"
+
+            # Aggregate all paragraphs from sections, subsections, and sub-subsections
+            paragraphs: List[str] = []
+            for section in item.get("sections", []) or []:
+                paragraphs.extend(section.get("paragraphs", []) or [])
+                for sub in section.get("subsections", []) or []:
+                    paragraphs.extend(sub.get("paragraphs", []) or [])
+                    for subsub in sub.get("subsections", []) or []:
+                        paragraphs.extend(subsub.get("paragraphs", []) or [])
+
+            paragraphs_filename = f"wikipedia_spans_{slug}.json"
+            paragraphs_path = os.path.join(args.out_dir, paragraphs_filename)
+            with open(paragraphs_path, "w", encoding="utf-8") as f:
+                json.dump(paragraphs, f, ensure_ascii=False, indent=2)
+            print(f"Saved paragraphs to {paragraphs_path} (count={len(paragraphs)})")
 
     # Save parsed Grokipedia JSON if any
     if parsed_grok:
