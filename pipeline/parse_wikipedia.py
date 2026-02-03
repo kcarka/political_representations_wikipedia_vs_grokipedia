@@ -1,10 +1,13 @@
-"""
-Parser for Wikipedia HTML structure.
+"""Parser for Wikipedia HTML structure.
+
+Extracts structured article content from Wikipedia HTML, organizing content
+into nested sections (h2/h3/h4), collecting paragraphs, and extracting references.
 
 Structure:
 - Main content in <div class="mw-content-container">
 - h2 headings define top-level sections (e.g., Early life and education, Business career)
 - h3 headings define subsections (e.g., Real estate, Licensing the Trump name)
+- h4 headings define sub-subsections for deeper nesting
 - Text is in <p> tags between headings
 - References extracted from inline <span class="reference-text"> elements
 """
@@ -15,13 +18,39 @@ from pipeline.text_clean import clean_span_text
 
 
 def parse_wikipedia_article(html: str) -> Dict[str, Any]:
-    """
-    Parse Wikipedia HTML into sections and references based on actual structure:
-    - h2 headings define top-level sections (wrapped in div.mw-heading mw-heading2)
-    - h3 headings define subsections (wrapped in div.mw-heading mw-heading3)
-    - h4 headings define sub-subsections (wrapped in div.mw-heading mw-heading4)
-    - Paragraph text appears after headings as siblings
-    - References extracted from inline <span class="reference-text"> elements
+    """Parse Wikipedia HTML into hierarchical sections and extract references.
+    
+    Extracts article structure from Wikipedia's MediaWiki HTML output, organizing
+    content into nested sections based on heading levels (h2/h3/h4). Paragraphs
+    are grouped under the deepest applicable heading level. All extracted text
+    is cleaned before storage.
+    
+    Args:
+        html: Raw HTML string from Wikipedia article page.
+    
+    Returns:
+        Dictionary with keys:
+        - 'sections': List of section dictionaries with 'title', 'paragraphs',
+                     and 'subsections' (recursive structure).
+        - 'references': List of reference dictionaries with 'url' and 'text' keys.
+    
+    Section structure:
+    {
+        "title": "Section Title",
+        "paragraphs": ["para1", "para2"],
+        "subsections": [
+            {
+                "title": "Subsection Title",
+                "paragraphs": ["para3"],
+                "subsections": [
+                    {
+                        "title": "Sub-subsection",
+                        "paragraphs": ["para4"]
+                    }
+                ]
+            }
+        ]
+    }
     """
     soup = BeautifulSoup(html, "html.parser")
 

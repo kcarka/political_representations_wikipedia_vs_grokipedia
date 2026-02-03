@@ -1,3 +1,17 @@
+"""Main pipeline orchestration for Wikipedia and Grokipedia data collection.
+
+Coordinates downloading of articles from Wikipedia and Grokipedia URLs, parsing
+their HTML into structured JSON, and generating spans-only JSON files for analysis.
+
+Usage:
+    python run_pipeline.py [--wiki-urls <path>] [--grok-urls <path>] [--out-dir <path>]
+
+The pipeline produces:
+- Raw HTML files: wikipedia_raw_<i>.html, grokipedia_raw_<i>.html
+- Parsed JSON: wikipedia_parsed.json, grokipedia_parsed.json
+- Spans-only JSON: wikipedia_spans_<slug>.json, grokipedia_spans_<slug>.json
+"""
+
 import argparse
 import json
 import os
@@ -10,6 +24,15 @@ from pipeline.parse_wikipedia import parse_wikipedia_article
 
 
 def read_lines(path: str) -> List[str]:
+    """Read non-empty, non-comment lines from a text file.
+    
+    Args:
+        path: File path to read from.
+    
+    Returns:
+        List of stripped lines, excluding empty lines and those starting with '#'.
+        Returns empty list if file doesn't exist.
+    """
     if not os.path.exists(path):
         return []
     with open(path, "r", encoding="utf-8") as f:
@@ -17,6 +40,15 @@ def read_lines(path: str) -> List[str]:
 
 
 def main():
+    """Main entry point for the data collection pipeline.
+    
+    Orchestrates the full pipeline:
+    1. Reads URLs from input files
+    2. Downloads raw HTML from Wikipedia and Grokipedia
+    3. Parses HTML into structured JSON
+    4. Saves parsed JSON and spans-only JSON files
+    5. Outputs file paths and counts
+    """
     parser = argparse.ArgumentParser(description="Download raw HTML from Wikipedia and Grokipedia for analysis.")
     parser.add_argument("--wiki-urls", default="data/seeds/wikipedia_urls.txt")
     parser.add_argument("--grok-urls", default="data/seeds/grokipedia_urls.txt")
