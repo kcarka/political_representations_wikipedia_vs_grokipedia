@@ -1,3 +1,16 @@
+"""Parser for Grokipedia HTML structure.
+
+Extracts structured article content from Grokipedia HTML, organizing content
+into sections (h2) and subsections (h3), collecting text spans, and extracting references.
+
+Structure:
+- h2 headings define top-level sections (e.g., Early Life)
+- h3 headings inside a section define subsections (e.g., Upbringing)
+- Text spans appear between headings (not as children)
+- Content flow: h2 -> [spans...] -> h3 -> [spans...] -> h3 -> [spans...] -> h2 -> [spans...]
+- References reside in a div#references containing an <ol> list
+"""
+
 from typing import Any, Dict, List, Optional
 
 from bs4 import BeautifulSoup, Tag
@@ -5,13 +18,32 @@ from pipeline.text_clean import clean_span_text
 
 
 def parse_grokipedia_article(html: str) -> Dict[str, Any]:
-    """
-    Parse Grokipedia HTML into sections and references based on actual structure:
-    - h2 headings define top-level sections (e.g., Early Life)
-    - h3 headings inside a section define subsections (e.g., Upbringing)
-    - Text spans appear between headings (not as children)
-    - Structure: h2 -> [spans...] -> h3 -> [spans...] -> h3 -> [spans...] -> h2 -> [spans...]
-    - References reside in a div#references containing an <ol> list
+    """Parse Grokipedia HTML into hierarchical sections and extract references.
+    
+    Extracts article structure from Grokipedia HTML output, organizing content
+    into sections based on heading levels (h2/h3). Text spans are grouped under
+    the applicable heading. All extracted text is cleaned before storage.
+    
+    Args:
+        html: Raw HTML string from Grokipedia article page.
+    
+    Returns:
+        Dictionary with keys:
+        - 'sections': List of section dictionaries with 'title', 'spans',
+                     and 'subsections' (h3-level sections).
+        - 'references': List of reference dictionaries with 'url' and 'text' keys.
+    
+    Section structure:
+    {
+        "title": "Early Life",
+        "spans": ["text snippet 1", "text snippet 2"],
+        "subsections": [
+            {
+                "title": "Upbringing",
+                "spans": ["more text"]
+            }
+        ]
+    }
     """
     soup = BeautifulSoup(html, "html.parser")
 
@@ -84,7 +116,17 @@ def parse_grokipedia_article(html: str) -> Dict[str, Any]:
 
 
 def _extract_references(soup: BeautifulSoup) -> List[Dict[str, str]]:
-    refs: List[Dict[str, str]] = []
+    """Extract references from Grokipedia's reference section.
+    
+    Looks for a div#references container with an <ol> list and extracts
+    links and text from each <li> item.
+    
+    Args:
+        soup: BeautifulSoup parsed HTML object.
+    
+    Returns:
+        List of reference dictionaries with 'url' and 'text' keys.
+    """
     ref_div = soup.find("div", id="references")
     if not ref_div:
         return refs

@@ -1,3 +1,10 @@
+"""Web scraping utilities for Wikipedia and Grokipedia articles.
+
+Provides functions to fetch and parse HTML from Wikipedia and Grokipedia,
+handling various retrieval strategies (direct GET, REST API, MediaWiki parse API),
+text extraction, and reference collection.
+"""
+
 import json
 import re
 import time
@@ -17,6 +24,19 @@ TIMEOUT = 20
 
 @dataclass
 class Article:
+    """Data class representing a scraped article from Wikipedia or Grokipedia.
+    
+    Attributes:
+        id: Unique identifier for the article (typically the URL).
+        url: Source URL of the article.
+        title: Article title/heading.
+        source: Source name ('wikipedia' or 'grokipedia').
+        categories: List of Wikipedia categories the article belongs to.
+        topic: Inferred topic classification (e.g., 'biography', 'policy', 'event').
+        raw_html: Raw HTML content from the source (for later parsing).
+        text: Extracted plain text content.
+        references: List of reference dictionaries with 'url' and 'text' keys.
+    """
     id: str
     url: str
     title: str
@@ -29,6 +49,17 @@ class Article:
 
 
 def _safe_get(url: str, source: str = "wiki") -> Optional[requests.Response]:
+    """Safely fetch a URL with error handling and logging.
+    
+    Wraps requests.get with timeout and error handling, logging failures to console.
+    
+    Args:
+        url: URL to fetch.
+        source: Source name for logging (e.g., 'wiki', 'grok').
+    
+    Returns:
+        requests.Response object if fetch succeeds, None otherwise.
+    """
     try:
         resp = requests.get(url, headers=HEADERS, timeout=TIMEOUT)
         if resp.status_code == 200:
@@ -41,6 +72,17 @@ def _safe_get(url: str, source: str = "wiki") -> Optional[requests.Response]:
 
 
 def _extract_title_from_url(url: str) -> Optional[str]:
+    """Extract Wikipedia article title from a Wikipedia URL.
+    
+    Parses URLs in the format https://en.wikipedia.org/wiki/Article_Title
+    to extract the article title.
+    
+    Args:
+        url: Wikipedia URL.
+    
+    Returns:
+        Article title if URL contains /wiki/, None otherwise.
+    """
     if "/wiki/" not in url:
         return None
     title = url.split("/wiki/", 1)[1]
@@ -48,6 +90,17 @@ def _extract_title_from_url(url: str) -> Optional[str]:
 
 
 def _fetch_wikipedia_html_rest(title: str) -> Optional[str]:
+    """Fetch Wikipedia article HTML via REST API.
+    
+    Uses the MediaWiki REST API (https://en.wikipedia.org/api/rest_v1) to fetch
+    page HTML, useful for bypassing certain rate limiting scenarios.
+    
+    Args:
+        title: Wikipedia article title (URL-encoded).
+    
+    Returns:
+        HTML content string if successful, None otherwise.
+    """
     rest_url = f"https://en.wikipedia.org/api/rest_v1/page/html/{title}"
     try:
         r = requests.get(rest_url, headers=HEADERS, timeout=TIMEOUT)
@@ -61,7 +114,17 @@ def _fetch_wikipedia_html_rest(title: str) -> Optional[str]:
 
 
 def _fetch_wikipedia_html_via_api(url: str) -> Optional[str]:
-    """Fallback to MediaWiki API parse endpoint when direct GET is blocked (e.g., 403/429)."""
+    """Fallback to MediaWiki API parse endpoint when direct GET is blocked (e.g., 403/429).
+    
+    Uses the MediaWiki parse API as a last-resort fallback for fetching Wikipedia content
+    when direct requests or REST API fail due to rate limiting or access restrictions.
+    
+    Args:
+        url: Full Wikipedia URL.
+    
+    Returns:
+        HTML content string if successful, None otherwise.
+    """
     title = _extract_title_from_url(url)
     if not title:
         return None
@@ -88,7 +151,18 @@ def _fetch_wikipedia_html_via_api(url: str) -> Optional[str]:
 
 
 def _clean_text_from_soup(soup: BeautifulSoup) -> str:
-    # Prefer main content container for Wikipedia; generic fallback for others
+    """Extract and clean plain text from parsed HTML soup.
+    
+    Removes navigation elements, tables, scripts, and other noise, then extracts
+    paragraphs. Uses multiple fallback strategies to ensure content extraction
+    even if page structure is non-standard.
+    
+    Args:
+        soup: BeautifulSoup parsed HTML object.
+    
+    Returns:
+        Cleaned plain text with paragraphs joined by newlines.
+    """
     main = soup.select_one("div.mw-parser-output") or soup.select_one("main") or soup.select_one("article")
     container = main or soup.body or soup
     print(f"[extract] using container: {container.name if container else 'None'}")
@@ -155,6 +229,17 @@ def _clean_text_from_soup(soup: BeautifulSoup) -> str:
 
 
 def _extract_references(soup: BeautifulSoup) -> List[Dict]:
+    """Extract reference links from parsed HTML.
+    
+    Extracts external links from Wikipedia reference lists or generic references/external links sections.
+    Returns a list of reference dictionaries with URL and text.
+    
+    Args:
+        soup: BeautifulSoup parsed HTML object.
+    
+    Returns:
+        List of reference dictionaries with 'url' and 'text' keys.
+    """
     refs: List[Dict] = []
     # Wikipedia references list
     ref_lists = soup.select("ol.references li")
@@ -183,7 +268,17 @@ def _extract_references(soup: BeautifulSoup) -> List[Dict]:
 
 
 def _extract_categories_wikipedia(soup: BeautifulSoup) -> List[str]:
-    cats = []
+    """Extract Wikipedia categories from parsed page HTML.
+    
+    Parses the category links section typically found at the bottom of Wikipedia pages.
+    
+    Args:
+        soup: BeautifulSoup parsed HTML object.
+    
+    Returns:
+        List of category names.
+    """
+    cats: List[str] = []
     catlinks = soup.select("div#mw-normal-catlinks ul li a")
     for a in catlinks:
         name = a.get_text(strip=True)
@@ -193,9 +288,20 @@ def _extract_categories_wikipedia(soup: BeautifulSoup) -> List[str]:
 
 
 def classify_topic(categories: List[str], text: str) -> Optional[str]:
+    """Infer article topic from Wikipedia categories and text content.
+    
+    Uses heuristic rules based on category names and text keywords to classify
+    articles into broad topics (biography, policy, event, institution, etc.).
+    
+    Args:
+        categories: List of Wikipedia category names.
+        text: Extracted text content from the article.
+    
+    Returns:
+        Inferred topic classification string, or None if no match.
+    """
     lcats = [c.lower() for c in categories]
     txt = text.lower()
-    # Heuristic rules
     if any("birth" in c or "biograph" in c for c in lcats) or ("born" in txt and "is a" in txt[:200]):
         return "biography"
     if any("policy" in c or "legislation" in c or "law" in c for c in lcats):
@@ -211,6 +317,21 @@ def classify_topic(categories: List[str], text: str) -> Optional[str]:
 
 
 def scrape_wikipedia_article(url: str) -> Optional[Article]:
+    """Fetch a single Wikipedia article with multiple fallback strategies.
+    
+    Attempts to fetch article HTML via:
+    1. Direct HTTP GET request
+    2. Wikipedia REST API
+    3. MediaWiki parse API (last resort)
+    
+    Returns an Article object with raw HTML for later parsing.
+    
+    Args:
+        url: Wikipedia article URL.
+    
+    Returns:
+        Article object with raw_html populated, or None if all fetching strategies fail.
+    """
     print(f"[wiki] fetching {url}")
     resp = _safe_get(url)
     html_content = None
@@ -248,6 +369,18 @@ def scrape_wikipedia_article(url: str) -> Optional[Article]:
 
 
 def scrape_wikipedia_from_urls(urls: List[str], sleep_secs: float = 0.5) -> List[Article]:
+    """Fetch multiple Wikipedia articles from a list of URLs.
+    
+    Fetches articles sequentially with a sleep delay between requests to avoid
+    rate limiting.
+    
+    Args:
+        urls: List of Wikipedia URLs to scrape.
+        sleep_secs: Seconds to wait between requests (default 0.5).
+    
+    Returns:
+        List of Article objects with raw_html populated.
+    """
     articles: List[Article] = []
     for url in urls:
         art = scrape_wikipedia_article(url)
@@ -258,6 +391,19 @@ def scrape_wikipedia_from_urls(urls: List[str], sleep_secs: float = 0.5) -> List
 
 
 def scrape_wikipedia_by_categories(categories: List[str], limit_per_cat: int = 20, sleep_secs: float = 0.5) -> List[Article]:
+    """Fetch Wikipedia articles by category using Wikipedia API category members list.
+    
+    Queries the Wikipedia API to retrieve articles belonging to specified categories,
+    then fetches each article.
+    
+    Args:
+        categories: List of Wikipedia category names (with or without 'Category:' prefix).
+        limit_per_cat: Maximum articles per category (default 20, max 50 per API).
+        sleep_secs: Seconds to wait between requests (default 0.5).
+    
+    Returns:
+        List of Article objects from matching categories.
+    """
     articles: List[Article] = []
     session = requests.Session()
     session.headers.update(HEADERS)
@@ -291,6 +437,18 @@ def scrape_wikipedia_by_categories(categories: List[str], limit_per_cat: int = 2
 
 
 def scrape_grokipedia_from_urls(urls: List[str], sleep_secs: float = 0.5, save_debug_html: bool = True) -> List[Article]:
+    """Fetch multiple Grokipedia articles from a list of URLs.
+    
+    Fetches articles sequentially with a sleep delay between requests.
+    
+    Args:
+        urls: List of Grokipedia URLs to scrape.
+        sleep_secs: Seconds to wait between requests (default 0.5).
+        save_debug_html: Unused parameter (kept for compatibility).
+    
+    Returns:
+        List of Article objects with raw_html populated.
+    """
     articles: List[Article] = []
     for i, url in enumerate(urls):
         print(f"[grok] fetching {url}")
@@ -318,5 +476,13 @@ def scrape_grokipedia_from_urls(urls: List[str], sleep_secs: float = 0.5, save_d
 
 
 def save_articles_json(articles: List[Article], path: str) -> None:
-    with open(path, "w", encoding="utf-8") as f:
+    """Save Article objects to JSON file.
+    
+    Serializes Article dataclass instances to JSON format using the asdict utility.
+    
+    Args:
+        articles: List of Article objects to save.
+        path: File path where JSON should be written.
+    """
+    with open(path, "w", encoding="utf-8") as f:    
         json.dump([asdict(a) for a in articles], f, ensure_ascii=False, indent=2)
