@@ -120,20 +120,26 @@ This returns you to your system Python environment.
 
 ## Pipeline Quickstart
 
-The initial data pipeline implements:
-- Scraping matched article pairs from provided Wikipedia and Grokipedia URLs
-- Extracting main text content and cited references
-- Cleaning text (lowercasing, stopword removal, lemmatization via `nltk`)
-- Mapping reference URLs to media domains and example bias/factuality scores
+The data pipeline implements a complete workflow for analyzing political bias representation:
+- Scraping matched article pairs from Wikipedia and Grokipedia URLs
+- Parsing hierarchical article structure (sections, subsections, paragraphs)
+- Extracting and normalizing cited references from inline reference elements
+- Mapping reference domains to media bias classifications from `mbfc.csv`
+- Generating political leaning distribution analysis comparing Wikipedia vs Grokipedia
 
-### Configure seeds
+### Configure sources
 
-Provide matched URL pairs by line order:
-- Line N in [data/seeds/wikipedia_urls.txt](data/seeds/wikipedia_urls.txt) pairs with line N in [data/seeds/grokipedia_urls.txt](data/seeds/grokipedia_urls.txt)
-- Example:
-  - Wikipedia line 1: `https://en.wikipedia.org/wiki/Donald_Trump`
-  - Grokipedia line 1: `https://grokipedia.com/page/Donald_Trump`
-- Optional: extend media score mappings at [data/media_scores.json](data/media_scores.json)
+Provide matched URL pairs via `data/seeds/sources.csv` with columns:
+- **Category**: Politician, Institution, or Law
+- **Subcategory**: Specific type (Left/Right for politicians, Government/Financial/etc. for institutions)
+- **Name**: Human-readable name
+- **Wikipedia_URL**: Full Wikipedia article URL
+- **Grokipedia_URL**: Full Grokipedia article URL
+
+The media bias database `data/mbfc.csv` must contain:
+- **source**: Domain name (e.g., "cnn.com", "nytimes.com")
+- **bias**: Classification (left/center/right/left-center/right-center)
+- **factual_reporting**: Factuality rating
 
 ### Run the pipeline
 
@@ -143,10 +149,30 @@ pip install -r requirements.txt
 python run_pipeline.py
 ```
 
-Outputs will be saved to `data/outputs/`:
-- `pairs.json` — matched article pairs with cleaned text and annotated references
+Optional arguments:
+```bash
+python run_pipeline.py --skip-crawl          # Reuse existing parsed JSON
+python run_pipeline.py --sources <path>      # Custom sources CSV
+python run_pipeline.py --out-dir <path>      # Custom output directory
+```
 
-Notes:
-- Wikipedia scraping uses direct page fetch plus MediaWiki API fallbacks to extract article text from `mw-parser-output`.
-- Grokipedia scraping is generic HTML extraction. If Grokipedia has a specific structure, update `pipeline/scrape.py` accordingly.
-- Pairs with empty text in either article are skipped.
+### Output files
+
+Generated in `data/outputs/`:
+- `wikipedia_parsed.json` — Full Wikipedia articles with hierarchical sections
+- `grokipedia_parsed.json` — Full Grokipedia articles with hierarchical sections
+- `wikipedia_spans_*.json` — Clean paragraph text per article
+- `grokipedia_spans_*.json` — Clean span text per article
+- `wikipedia_references.json` — Reference domains indexed by source
+- `grokipedia_references.json` — Reference domains indexed by source
+- `political_leaning.csv` — Bias distribution analysis
+
+### Implementation notes
+
+- **Wikipedia parsing**: h2/h3/h4 hierarchy from `<div class="mw-content-container">`
+- **Grokipedia parsing**: h2/h3 hierarchy with text spans
+- **Reference extraction**: Inline `<span class="reference-text">` elements
+- **Text cleaning**: HTML entities, escaped quotes, Wikipedia citations removed
+- **Domain normalization**: Scheme/www/news prefixes removed, malformed domains handled
+- **Bias mapping**: Left/Center/Right based on `mbfc.csv` classification
+- **Error handling**: Missing domains in `mbfc.csv` marked as "Other" and logged
