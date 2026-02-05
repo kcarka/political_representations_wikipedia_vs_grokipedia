@@ -106,7 +106,10 @@ Once the virtual environment is activated, install the necessary packages from t
 
 ```bash
 pip install -r requirements.txt
+pip install vaderSentiment
 ```
+If PowerShell blocks script execution, enable local scripts once:
+Set-ExecutionPolicy -Scope CurrentUser RemoteSigned
 
 ### Step 5: Deactivate the Virtual Environment (Optional)
 
