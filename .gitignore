@@ -209,3 +209,20 @@ __marimo__/
 # Project outputs
 data/outputs/*.html
 data/outputs/*.json
+
+# --- generated data / outputs ---
+data/cache/
+data/indices/
+data/outputs/
+data/seeds/
+*.jsonl
+
+# --- python ---
+venv/
+__pycache__/
+*.pyc
+
+# --- OS / editors ---
+.DS_Store
+Thumbs.db
+
