@@ -241,10 +241,11 @@ data/outputs/biography_topk_negative_paragraphs.json
 This file highlights Top-K paragraphs exhibiting the largest sentiment gaps,
 enabling qualitative inspection of narrative framing differences.
 
-Reproducibility Notes
+### Reproducibility Notes
 
 Generated data (data/outputs, data/indices, data/cache) are excluded via .gitignore.
 
 All analyses are deterministic given fixed indices.
 
-The original seed-based pipeline remains available for reference but is no longer required.
+This study relies exclusively on the index-based, type-stratified pipeline described above.
+
