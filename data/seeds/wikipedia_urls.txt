@@ -1,4 +1,0 @@
-# Add Wikipedia article URLs, one per line.
-# These pair with grokipedia_urls.txt by line order (line N wiki URL pairs with line N grok URL).
-# Examples:
-https://en.wikipedia.org/wiki/Donald_Trump

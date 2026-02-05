@@ -127,6 +127,7 @@ def _extract_references(soup: BeautifulSoup) -> List[Dict[str, str]]:
     Returns:
         List of reference dictionaries with 'url' and 'text' keys.
     """
+    refs: List[Dict[str, str]] = []
     ref_div = soup.find("div", id="references")
     if not ref_div:
         return refs

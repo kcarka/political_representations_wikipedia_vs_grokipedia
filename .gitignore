@@ -209,3 +209,4 @@ __marimo__/
 # Project outputs
 data/outputs/*.html
 data/outputs/*.json
+data/.DS_Store

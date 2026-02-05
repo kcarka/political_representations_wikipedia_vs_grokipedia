@@ -1,0 +1,102 @@
+Category,Subcategory,Name,Wikipedia_URL,Grokipedia_URL
+Politician,Left,Alexandria Ocasio-Cortez,https://en.wikipedia.org/wiki/Alexandria_Ocasio-Cortez,https://grokipedia.com/page/Alexandria_Ocasio-Cortez
+Politician,Left,Bernie Sanders,https://en.wikipedia.org/wiki/Bernie_Sanders,https://grokipedia.com/page/Bernie_Sanders
+Politician,Left,Ilhan Omar,https://en.wikipedia.org/wiki/Ilhan_Omar,https://grokipedia.com/page/Ilhan_Omar
+Politician,Left,Rashida Tlaib,https://en.wikipedia.org/wiki/Rashida_Tlaib,https://grokipedia.com/page/Rashida_Tlaib
+Politician,Left,Elizabeth Warren,https://en.wikipedia.org/wiki/Elizabeth_Warren,https://grokipedia.com/page/Elizabeth_Warren
+Politician,Left,Gavin Newsom,https://en.wikipedia.org/wiki/Gavin_Newsom,https://grokipedia.com/page/Gavin_Newsom
+Politician,Left,Pramila Jayapal,https://en.wikipedia.org/wiki/Pramila_Jayapal,https://grokipedia.com/page/Pramila_Jayapal
+Politician,Left,Cori Bush,https://en.wikipedia.org/wiki/Cori_Bush,https://grokipedia.com/page/Cori_Bush
+Politician,Left,Jamaal Bowman,https://en.wikipedia.org/wiki/Jamaal_Bowman,https://grokipedia.com/page/Jamaal_Bowman
+Politician,Left,Ayanna Pressley,https://en.wikipedia.org/wiki/Ayanna_Pressley,https://grokipedia.com/page/Ayanna_Pressley
+Politician,Right,Donald Trump,https://en.wikipedia.org/wiki/Donald_Trump,https://grokipedia.com/page/Donald_Trump
+Politician,Right,Elon Musk,https://en.wikipedia.org/wiki/Elon_Musk,https://grokipedia.com/page/Elon_Musk
+Politician,Right,Ron DeSantis,https://en.wikipedia.org/wiki/Ron_DeSantis,https://grokipedia.com/page/Ron_DeSantis
+Politician,Right,Marjorie Taylor Greene,https://en.wikipedia.org/wiki/Marjorie_Taylor_Greene,https://grokipedia.com/page/Marjorie_Taylor_Greene
+Politician,Right,Matt Gaetz,https://en.wikipedia.org/wiki/Matt_Gaetz,https://grokipedia.com/page/Matt_Gaetz
+Politician,Right,Lauren Boebert,https://en.wikipedia.org/wiki/Lauren_Boebert,https://grokipedia.com/page/Lauren_Boebert
+Politician,Right,Ted Cruz,https://en.wikipedia.org/wiki/Ted_Cruz,https://grokipedia.com/page/Ted_Cruz
+Politician,Right,Josh Hawley,https://en.wikipedia.org/wiki/Josh_Hawley,https://grokipedia.com/page/Josh_Hawley
+Politician,Right,J.D. Vance,https://en.wikipedia.org/wiki/J._D._Vance,https://grokipedia.com/page/JD_Vance
+Politician,Right,Vivek Ramaswamy,https://en.wikipedia.org/wiki/Vivek_Ramaswamy,https://grokipedia.com/page/Vivek_Ramaswamy
+Institution,Government,Supreme Court of the United States,https://en.wikipedia.org/wiki/Supreme_Court_of_the_United_States,https://grokipedia.com/page/Supreme_Court_of_the_United_States
+Institution,Government,Federal Bureau of Investigation,https://en.wikipedia.org/wiki/Federal_Bureau_of_Investigation,https://grokipedia.com/page/Federal_Bureau_of_Investigation
+Institution,Government,Central Intelligence Agency,https://en.wikipedia.org/wiki/Central_Intelligence_Agency,https://grokipedia.com/page/Central_Intelligence_Agency
+Institution,Government,Department of Justice,https://en.wikipedia.org/wiki/United_States_Department_of_Justice,https://grokipedia.com/page/United_States_Department_of_Justice
+Institution,Government,Environmental Protection Agency,https://en.wikipedia.org/wiki/United_States_Environmental_Protection_Agency,https://grokipedia.com/page/United_States_Environmental_Protection_Agency
+Institution,Government,Internal Revenue Service,https://en.wikipedia.org/wiki/Internal_Revenue_Service,https://grokipedia.com/page/Internal_Revenue_Service
+Institution,Government,National Security Agency,https://en.wikipedia.org/wiki/National_Security_Agency,https://grokipedia.com/page/National_Security_Agency
+Institution,Government,Centers for Disease Control and Prevention,https://en.wikipedia.org/wiki/Centers_for_Disease_Control_and_Prevention,https://grokipedia.com/page/Centers_for_Disease_Control_and_Prevention
+Institution,Financial,Federal Reserve,https://en.wikipedia.org/wiki/Federal_Reserve,https://grokipedia.com/page/Federal_Reserve
+Institution,Legislative,United States Congress,https://en.wikipedia.org/wiki/United_States_Congress,https://grokipedia.com/page/United_States_Congress
+Institution,Legislative,United States Senate,https://en.wikipedia.org/wiki/United_States_Senate,https://grokipedia.com/page/United_States_Senate
+Institution,Legislative,United States House of Representatives,https://en.wikipedia.org/wiki/United_States_House_of_Representatives,https://grokipedia.com/page/United_States_House_of_Representatives
+Institution,Government,Department of Education,https://en.wikipedia.org/wiki/United_States_Department_of_Education,https://grokipedia.com/page/United_States_Department_of_Education
+Institution,Government,Department of Homeland Security,https://en.wikipedia.org/wiki/United_States_Department_of_Homeland_Security,https://grokipedia.com/page/United_States_Department_of_Homeland_Security
+Institution,Government,Immigration and Customs Enforcement,https://en.wikipedia.org/wiki/U.S._Immigration_and_Customs_Enforcement,https://grokipedia.com/page/United_States_Immigration_and_Customs_Enforcement
+Institution,NGO,Planned Parenthood,https://en.wikipedia.org/wiki/Planned_Parenthood,https://grokipedia.com/page/Planned_Parenthood
+Institution,NGO,National Rifle Association,https://en.wikipedia.org/wiki/National_Rifle_Association,https://grokipedia.com/page/National_Rifle_Association
+Institution,Think Tank,Heritage Foundation,https://en.wikipedia.org/wiki/The_Heritage_Foundation,https://grokipedia.com/page/The_Heritage_Foundation
+Institution,Think Tank,Brookings Institution,https://en.wikipedia.org/wiki/Brookings_Institution,https://grokipedia.com/page/Brookings_Institution
+Institution,NGO,American Civil Liberties Union,https://en.wikipedia.org/wiki/American_Civil_Liberties_Union,https://grokipedia.com/page/American_Civil_Liberties_Union
+Law,Social,Affordable Care Act,https://en.wikipedia.org/wiki/Affordable_Care_Act,https://grokipedia.com/page/Affordable_Care_Act
+Law,Economy,Tax Cuts and Jobs Act of 2017,https://en.wikipedia.org/wiki/Tax_Cuts_and_Jobs_Act_of_2017,https://grokipedia.com/page/Tax_Cuts_and_Jobs_Act
+Law,Security,Patriot Act,https://en.wikipedia.org/wiki/Patriot_Act,https://grokipedia.com/page/Patriot_Act
+Law,Economy,Inflation Reduction Act,https://en.wikipedia.org/wiki/Inflation_Reduction_Act,https://grokipedia.com/page/Inflation_Reduction_Act
+Law,Rights,Voting Rights Act of 1965,https://en.wikipedia.org/wiki/Voting_Rights_Act_of_1965,https://grokipedia.com/page/Voting_Rights_Act_of_1965
+Law,Rights,Civil Rights Act of 1964,https://en.wikipedia.org/wiki/Civil_Rights_Act_of_1964,https://grokipedia.com/page/Civil_Rights_Act_of_1964
+Law,Security,Bipartisan Safer Communities Act,https://en.wikipedia.org/wiki/Bipartisan_Safer_Communities_Act,https://grokipedia.com/page/Bipartisan_Safer_Communities_Act
+Law,Economy,Dodd-Frank Wall Street Reform Act,https://en.wikipedia.org/wiki/Dodd-Frank_Wall_Street_Reform_and_Consumer_Protection_Act,https://grokipedia.com/page/Dodd%E2%80%93Frank_Wall_Street_Reform_and_Consumer_Protection_Act
+Law,Education,No Child Left Behind Act,https://en.wikipedia.org/wiki/No_Child_Left_Behind_Act,https://grokipedia.com/page/No_Child_Left_Behind_Act
+Law,Social,Defense of Marriage Act,https://en.wikipedia.org/wiki/Defense_of_Marriage_Act,https://grokipedia.com/page/defense_of_marriage_act
+Law,Tech,CHIPS and Science Act,https://en.wikipedia.org/wiki/CHIPS_and_Science_Act,https://grokipedia.com/page/CHIPS_and_Science_Act
+Law,Security,Gun Control Act of 1968,https://en.wikipedia.org/wiki/Gun_Control_Act_of_1968,https://grokipedia.com/page/Gun_Control_Act_of_1968
+Law,Environment,National Environmental Policy Act,https://en.wikipedia.org/wiki/National_Environmental_Policy_Act,https://grokipedia.com/page/National_Environmental_Policy_Act
+Law,Social,Religious Freedom Restoration Act,https://en.wikipedia.org/wiki/Religious_Freedom_Restoration_Act,https://grokipedia.com/page/Religious_Freedom_Restoration_Act
+Law,Gov,Freedom of Information Act,https://en.wikipedia.org/wiki/Freedom_of_Information_Act_(United_States),https://grokipedia.com/page/Freedom_of_Information_Act_(United_States)
+Law,Education,Title IX,https://en.wikipedia.org/wiki/Title_IX,https://grokipedia.com/page/Title_IX
+Law,Immigration,DREAM Act,https://en.wikipedia.org/wiki/DREAM_Act,https://grokipedia.com/page/DREAM_Act
+Law,Justice,First Step Act,https://en.wikipedia.org/wiki/First_Step_Act,https://grokipedia.com/page/First_Step_Act
+Law,Rights,Equality Act,https://en.wikipedia.org/wiki/Equality_Act_(United_States),https://grokipedia.com/page/Equality_Act_(United_States)
+Law,Economy,American Rescue Plan Act of 2021,https://en.wikipedia.org/wiki/American_Rescue_Plan_Act_of_2021,https://grokipedia.com/page/American_Rescue_Plan_Act_of_2021
+Category,Subcategory,Name,Wikipedia_URL,Grokipedia_URL
+Politician,Left,Joe Biden,https://en.wikipedia.org/wiki/Joe_Biden,https://grokipedia.com/page/Joe_Biden
+Politician,Left,Kamala Harris,https://en.wikipedia.org/wiki/Kamala_Harris,https://grokipedia.com/page/Kamala_Harris
+Politician,Left,Nancy Pelosi,https://en.wikipedia.org/wiki/Nancy_Pelosi,https://grokipedia.com/page/Nancy_Pelosi
+Politician,Left,Chuck Schumer,https://en.wikipedia.org/wiki/Chuck_Schumer,https://grokipedia.com/page/Chuck_Schumer
+Politician,Left,Adam Schiff,https://en.wikipedia.org/wiki/Adam_Schiff,https://grokipedia.com/page/Adam_Schiff
+Politician,Left,Katie Porter,https://en.wikipedia.org/wiki/Katie_Porter,https://grokipedia.com/page/Katie_Porter
+Politician,Left,Ro Khanna,https://en.wikipedia.org/wiki/Ro_Khanna,https://grokipedia.com/page/Ro_Khanna
+Politician,Left,Hakeem Jeffries,https://en.wikipedia.org/wiki/Hakeem_Jeffries,https://grokipedia.com/page/Hakeem_Jeffries
+Politician,Left,Raphael Warnock,https://en.wikipedia.org/wiki/Raphael_Warnock,https://grokipedia.com/page/Raphael_Warnock
+Politician,Left,John Fetterman,https://en.wikipedia.org/wiki/John_Fetterman,https://grokipedia.com/page/John_Fetterman
+Politician,Left,Pete Buttigieg,https://en.wikipedia.org/wiki/Pete_Buttigieg,https://grokipedia.com/page/Pete_Buttigieg
+Politician,Left,Stacey Abrams,https://en.wikipedia.org/wiki/Stacey_Abrams,https://grokipedia.com/page/Stacey_Abrams
+Politician,Left,Jamie Raskin,https://en.wikipedia.org/wiki/Jamie_Raskin,https://grokipedia.com/page/Jamie_Raskin
+Politician,Left,Eric Swalwell,https://en.wikipedia.org/wiki/Eric_Swalwell,https://grokipedia.com/page/Eric_Swalwell
+Politician,Left,Barbara Lee,https://en.wikipedia.org/wiki/Barbara_Lee,https://grokipedia.com/page/Barbara_Lee
+Politician,Right,Mike Pence,https://en.wikipedia.org/wiki/Mike_Pence,https://grokipedia.com/page/Mike_Pence
+Politician,Right,Nikki Haley,https://en.wikipedia.org/wiki/Nikki_Haley,https://grokipedia.com/page/Nikki_Haley
+Politician,Right,Marco Rubio,https://en.wikipedia.org/wiki/Marco_Rubio,https://grokipedia.com/page/Marco_Rubio
+Politician,Right,Tim Scott,https://en.wikipedia.org/wiki/Tim_Scott,https://grokipedia.com/page/Tim_Scott
+Politician,Right,Mike Johnson,https://en.wikipedia.org/wiki/Mike_Johnson_(politician),https://grokipedia.com/page/Mike_Johnson
+Politician,Right,Jim Jordan,https://en.wikipedia.org/wiki/Jim_Jordan_(American_politician),https://grokipedia.com/page/Jim_Jordan
+Politician,Right,Kari Lake,https://en.wikipedia.org/wiki/Kari_Lake,https://grokipedia.com/page/Kari_Lake
+Politician,Right,Byron Donalds,https://en.wikipedia.org/wiki/Byron_Donalds,https://grokipedia.com/page/Byron_Donalds
+Politician,Right,Greg Abbott,https://en.wikipedia.org/wiki/Greg_Abbott,https://grokipedia.com/page/Greg_Abbott
+Politician,Right,Kristi Noem,https://en.wikipedia.org/wiki/Kristi_Noem,https://grokipedia.com/page/Kristi_Noem
+Politician,Right,Elise Stefanik,https://en.wikipedia.org/wiki/Elise_Stefanik,https://grokipedia.com/page/Elise_Stefanik
+Politician,Right,Rick Scott,https://en.wikipedia.org/wiki/Rick_Scott,https://grokipedia.com/page/Rick_Scott
+Politician,Right,Tommy Tuberville,https://en.wikipedia.org/wiki/Tommy_Tuberville,https://grokipedia.com/page/Tommy_Tuberville
+Politician,Right,Thomas Massie,https://en.wikipedia.org/wiki/Thomas_Massie,https://grokipedia.com/page/Thomas_Massie
+Politician,Right,Chip Roy,https://en.wikipedia.org/wiki/Chip_Roy,https://grokipedia.com/page/Chip_Roy
+Institution,Health,National Institutes of Health,https://en.wikipedia.org/wiki/National_Institutes_of_Health,https://grokipedia.com/page/National_Institutes_of_Health
+Institution,Global,World Economic Forum,https://en.wikipedia.org/wiki/World_Economic_Forum,https://grokipedia.com/page/World_Economic_Forum
+Institution,Social,Black Lives Matter,https://en.wikipedia.org/wiki/Black_Lives_Matter,https://grokipedia.com/page/Black_Lives_Matter
+Institution,Legal,Federalist Society,https://en.wikipedia.org/wiki/Federalist_Society,https://grokipedia.com/page/Federalist_Society
+Institution,NGO,Southern Poverty Law Center,https://en.wikipedia.org/wiki/Southern_Poverty_Law_Center,https://grokipedia.com/page/Southern_Poverty_Law_Center
+Law,Rights,Violence Against Women Act,https://en.wikipedia.org/wiki/Violence_Against_Women_Act,https://grokipedia.com/page/Violence_Against_Women_Act
+Law,Social,Social Security Act,https://en.wikipedia.org/wiki/Social_Security_Act,https://grokipedia.com/page/Social_Security_Act
+Law,Rights,Americans with Disabilities Act,https://en.wikipedia.org/wiki/Americans_with_Disabilities_Act_of_1990,https://grokipedia.com/page/Americans_with_Disabilities_Act_of_1990
+Law,Immigration,Immigration and Nationality Act of 1965,https://en.wikipedia.org/wiki/Immigration_and_Nationality_Act_of_1965,https://grokipedia.com/page/Immigration_and_Nationality_Act_of_1965
+Law,Economy,Infrastructure Investment and Jobs Act,https://en.wikipedia.org/wiki/Infrastructure_Investment_and_Jobs_Act,https://grokipedia.com/page/Infrastructure_Investment_and_Jobs_Act

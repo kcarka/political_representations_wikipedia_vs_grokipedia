@@ -14,9 +14,11 @@ matplotlib==3.10.8
 nltk==3.9.2
 numpy==2.2.6
 packaging==26.0
+pandas==2.3.3
 pillow==12.1.0
 pyparsing==3.3.2
 python-dateutil==2.9.0.post0
+pytz==2025.2
 regex==2026.1.15
 requests==2.32.5
 requests-file==3.0.1
@@ -28,4 +30,5 @@ threadpoolctl==3.6.0
 tldextract==3.6.0
 tqdm==4.67.1
 typing_extensions==4.15.0
+tzdata==2025.3
 urllib3==2.6.3

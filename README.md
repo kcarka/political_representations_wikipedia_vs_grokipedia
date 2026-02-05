@@ -121,14 +121,26 @@ This returns you to your system Python environment.
 
 ## Pipeline Quickstart
 
-This repository now supports an **index-based, type-stratified pipeline**
-that supersedes the earlier seed-based URL pairing approach.
-The new pipeline enables scalable, balanced, and reproducible comparisons
-between Grokipedia and English Wikipedia.
+The data pipeline implements a complete workflow for analyzing political bias representation:
+- Scraping matched article pairs from Wikipedia and Grokipedia URLs
+- Parsing hierarchical article structure (sections, subsections, paragraphs)
+- Extracting and normalizing cited references from inline reference elements
+- Mapping reference domains to media bias classifications from `mbfc.csv`
+- Generating political leaning distribution analysis comparing Wikipedia vs Grokipedia
 
----
+### Configure sources
 
-### Overview of the Updated Pipeline
+Provide matched URL pairs via `data/seeds/sources.csv` with columns:
+- **Category**: Politician, Institution, or Law
+- **Subcategory**: Specific type (Left/Right for politicians, Government/Financial/etc. for institutions)
+- **Name**: Human-readable name
+- **Wikipedia_URL**: Full Wikipedia article URL
+- **Grokipedia_URL**: Full Grokipedia article URL
+
+The media bias database `data/mbfc.csv` must contain:
+- **source**: Domain name (e.g., "cnn.com", "nytimes.com")
+- **bias**: Classification (left/center/right/left-center/right-center)
+- **factual_reporting**: Factuality rating
 
 The current pipeline implements the following stages:
 
@@ -248,5 +260,30 @@ Generated data (data/outputs, data/indices, data/cache) are excluded via .gitign
 
 All analyses are deterministic given fixed indices.
 
-This study relies exclusively on the index-based, type-stratified pipeline described above.
+Optional arguments:
+```bash
+python run_pipeline.py --skip-crawl          # Reuse existing parsed JSON
+python run_pipeline.py --sources <path>      # Custom sources CSV
+python run_pipeline.py --out-dir <path>      # Custom output directory
+```
 
+### Output files
+
+Generated in `data/outputs/`:
+- `wikipedia_parsed.json` — Full Wikipedia articles with hierarchical sections
+- `grokipedia_parsed.json` — Full Grokipedia articles with hierarchical sections
+- `wikipedia_spans_*.json` — Clean paragraph text per article
+- `grokipedia_spans_*.json` — Clean span text per article
+- `wikipedia_references.json` — Reference domains indexed by source
+- `grokipedia_references.json` — Reference domains indexed by source
+- `political_leaning.csv` — Bias distribution analysis
+
+### Implementation notes
+
+- **Wikipedia parsing**: h2/h3/h4 hierarchy from `<div class="mw-content-container">`
+- **Grokipedia parsing**: h2/h3 hierarchy with text spans
+- **Reference extraction**: Inline `<span class="reference-text">` elements
+- **Text cleaning**: HTML entities, escaped quotes, Wikipedia citations removed
+- **Domain normalization**: Scheme/www/news prefixes removed, malformed domains handled
+- **Bias mapping**: Left/Center/Right based on `mbfc.csv` classification
+- **Error handling**: Missing domains in `mbfc.csv` marked as "Other" and logged
