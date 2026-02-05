@@ -13,6 +13,7 @@ This repository implements a comparative analysis methodology for assessing poli
   - [Synthesis and Research Question Mapping](#6-synthesis-and-research-question-mapping)
 - [Installation Instructions](#installation-instructions)
  - [Pipeline Quickstart](#pipeline-quickstart)
+ - [Installation Instructions](#Installation-Instructions)
 
 ## Research Questions
 
