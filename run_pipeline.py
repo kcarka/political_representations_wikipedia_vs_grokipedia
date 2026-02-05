@@ -342,6 +342,7 @@ def main():
         - grokipedia_parsed.json: Hierarchical Grokipedia articles with sections and references
         - wikipedia_references.json: Domain lists indexed by source row
         - grokipedia_references.json: Domain lists indexed by source row
+        - failed_crawls.csv: Crawl failures where a platform returned empty HTML or failed to fetch
         - wikipedia_spans_<idx>_<name>.json: Clean paragraph text per article
         - grokipedia_spans_<idx>_<name>.json: Clean span text per article
     
@@ -391,6 +392,12 @@ def main():
         # Normal flow: download and parse
         print(f"\nProcessing {len(wiki_urls)} Wikipedia and {len(grok_urls)} Grokipedia articles...")
         
+        # Track crawl failures per platform
+        wiki_status_by_idx: Dict[int, str] = {}
+        wiki_reason_by_idx: Dict[int, str] = {}
+        grok_status_by_idx: Dict[int, str] = {}
+        grok_reason_by_idx: Dict[int, str] = {}
+
         # Process Wikipedia
         print("\n--- Downloading Wikipedia articles ---")
         for i, row in df.iterrows():
@@ -401,9 +408,18 @@ def main():
             
             print(f"[{i}] Fetching Wikipedia: {name}")
             articles = scrape_wikipedia_from_urls([url])
-            if not articles or not articles[0].raw_html:
+            if not articles:
+                wiki_status_by_idx[i] = "failed"
+                wiki_reason_by_idx[i] = "no_article_returned"
                 print(f"  Skip: no article returned")
                 continue
+            if not articles[0].raw_html:
+                wiki_status_by_idx[i] = "failed"
+                wiki_reason_by_idx[i] = "empty_html"
+                print(f"  Skip: empty HTML")
+                continue
+            wiki_status_by_idx[i] = "ok"
+            wiki_reason_by_idx[i] = ""
             
             raw_html = articles[0].raw_html
             # out_path = os.path.join(args.out_dir, f"wikipedia_raw_{i}.html")
@@ -431,9 +447,18 @@ def main():
             
             print(f"[{i}] Fetching Grokipedia: {name}")
             articles = scrape_grokipedia_from_urls([url])
-            if not articles or not articles[0].raw_html:
+            if not articles:
+                grok_status_by_idx[i] = "failed"
+                grok_reason_by_idx[i] = "no_article_returned"
                 print(f"  Skip: no article returned")
                 continue
+            if not articles[0].raw_html:
+                grok_status_by_idx[i] = "failed"
+                grok_reason_by_idx[i] = "empty_html"
+                print(f"  Skip: empty HTML")
+                continue
+            grok_status_by_idx[i] = "ok"
+            grok_reason_by_idx[i] = ""
             
             raw_html = articles[0].raw_html
             # out_path = os.path.join(args.out_dir, f"grokipedia_raw_{i}.html")
@@ -503,6 +528,45 @@ def main():
                     json.dump(spans, f, ensure_ascii=False, indent=2)
                 print(f"Saved Grokipedia spans to {spans_filename} (count={len(spans)})")
         
+        # Log failed crawls (empty HTML or fetch failures) to CSV
+        failed_rows = []
+        for i, row in df.iterrows():
+            wiki_status = wiki_status_by_idx.get(i, "not_attempted")
+            grok_status = grok_status_by_idx.get(i, "not_attempted")
+            wiki_reason = wiki_reason_by_idx.get(i, "")
+            grok_reason = grok_reason_by_idx.get(i, "")
+
+            if wiki_status != "ok" or grok_status != "ok":
+                failed_rows.append({
+                    "Name": row.get("Name", ""),
+                    "Category": row.get("Category", ""),
+                    "Subcategory": row.get("Subcategory", ""),
+                    "Wikipedia_URL": row.get("Wikipedia_URL", ""),
+                    "Grokipedia_URL": row.get("Grokipedia_URL", ""),
+                    "Wikipedia_Status": wiki_status,
+                    "Wikipedia_Reason": wiki_reason,
+                    "Grokipedia_Status": grok_status,
+                    "Grokipedia_Reason": grok_reason,
+                })
+
+        failed_output_path = os.path.join(args.out_dir, "failed_crawls.csv")
+        failed_df = pd.DataFrame(
+            failed_rows,
+            columns=[
+                "Name",
+                "Category",
+                "Subcategory",
+                "Wikipedia_URL",
+                "Grokipedia_URL",
+                "Wikipedia_Status",
+                "Wikipedia_Reason",
+                "Grokipedia_Status",
+                "Grokipedia_Reason",
+            ],
+        )
+        failed_df.to_csv(failed_output_path, index=False)
+        print(f"\nSaved crawl failure log to {failed_output_path} ({len(failed_df)} rows)")
+
         # Extract and save reference domain roots indexed by source index
         print("\n--- Extracting reference domain roots ---")
         if parsed_wiki:
