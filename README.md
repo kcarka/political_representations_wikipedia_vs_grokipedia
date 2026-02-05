@@ -120,33 +120,129 @@ This returns you to your system Python environment.
 
 ## Pipeline Quickstart
 
-The initial data pipeline implements:
-- Scraping matched article pairs from provided Wikipedia and Grokipedia URLs
-- Extracting main text content and cited references
-- Cleaning text (lowercasing, stopword removal, lemmatization via `nltk`)
-- Mapping reference URLs to media domains and example bias/factuality scores
+This repository now supports an **index-based, type-stratified pipeline**
+that supersedes the earlier seed-based URL pairing approach.
+The new pipeline enables scalable, balanced, and reproducible comparisons
+between Grokipedia and English Wikipedia.
 
-### Configure seeds
+---
 
-Provide matched URL pairs by line order:
-- Line N in [data/seeds/wikipedia_urls.txt](data/seeds/wikipedia_urls.txt) pairs with line N in [data/seeds/grokipedia_urls.txt](data/seeds/grokipedia_urls.txt)
-- Example:
-  - Wikipedia line 1: `https://en.wikipedia.org/wiki/Donald_Trump`
-  - Grokipedia line 1: `https://grokipedia.com/page/Donald_Trump`
-- Optional: extend media score mappings at [data/media_scores.json](data/media_scores.json)
+### Overview of the Updated Pipeline
 
-### Run the pipeline
+The current pipeline implements the following stages:
 
-```bash
-source venv/bin/activate  # macOS/Linux
-pip install -r requirements.txt
+1. **Category-based article discovery from Wikipedia**
+2. **Automatic pairing with Grokipedia pages**
+3. **Type-stratified quota balancing**
+4. **Article scraping and parsing**
+5. **Paragraph-level alignment**
+6. **Statistical and qualitative bias analysis**
+
+The earlier manual seed files (`wikipedia_urls.txt`, `grokipedia_urls.txt`)
+are no longer required for the main analysis.
+
+---
+
+### Step 1: Discover Matched Article Pairs by Political Type
+
+Articles are discovered via Wikipedia category crawling and assigned to one of
+four semantic types:
+
+- **biography** (political actors)
+- **institution** (political organizations, systems)
+- **law** (constitutional and statutory texts)
+- **event** (elections, controversies, crises)
+
+Example: discovering political biographies
+
+```powershell
+python -m pair_discovery.build_pairs_index `
+  --category "Category:American politicians" `
+  --limit 120 `
+  --out data\indices\index_bio.jsonl `
+  --manifest data\indices\manifest_bio.json
+
+Example: discovering legal domain articles
+
+python -m pair_discovery.build_pairs_index `
+  --category "Category:United States constitutional law" `
+  --limit 120 `
+  --out data\indices\index_law.jsonl `
+  --manifest data\indices\manifest_law.json
+Equivalent commands can be run for institutions and events.
+
+Step 2: Merge Indices with Type-Balanced Quotas
+
+To avoid dominance by any single article type, discovered indices are merged
+using quota-based stratification:
+python -m pair_discovery.merge_and_quota_index `
+  --bio data\indices\index_bio.jsonl `
+  --inst data\indices\index_inst.jsonl `
+  --law data\indices\index_law.jsonl `
+  --event data\indices\index_event.jsonl `
+  --quota 30 `
+  --out data\indices\pairs_index_balanced.jsonl `
+  --manifest data\indices\manifest_balanced.json
+This produces a balanced index suitable for cross-type comparison.
+
+Step 3: Export Paired Seeds and Scrape Articles
+
+The balanced index is converted into paired URLs and used to fetch articles
+from both platforms:
+python -m pair_discovery.export_seeds_from_index `
+  --index data\indices\pairs_index_balanced.jsonl `
+  --out_dir data\seeds `
+  --max_pairs 0
+
 python run_pipeline.py
-```
+This step downloads raw HTML and parses article content and structure.
 
-Outputs will be saved to `data/outputs/`:
-- `pairs.json` — matched article pairs with cleaned text and annotated references
+Step 4: Build Paragraph-Level Paired Dataset
 
-Notes:
-- Wikipedia scraping uses direct page fetch plus MediaWiki API fallbacks to extract article text from `mw-parser-output`.
-- Grokipedia scraping is generic HTML extraction. If Grokipedia has a specific structure, update `pipeline/scrape.py` accordingly.
-- Pairs with empty text in either article are skipped.
+Parsed articles are aligned into paragraph-level pairs:
+python -m pair_discovery.build_pairs_dataset `
+  --meta data\seeds\pairs_meta.jsonl `
+  --outputs_dir data\outputs `
+  --out data\outputs\pairs_dataset.jsonl
+Each entry contains:
+
+article title
+
+semantic type
+
+source platform
+
+paragraph text
+
+paragraph position
+
+Step 5: Type-Stratified Sentiment Analysis
+
+Sentiment scores are computed using VADER and compared in a paired setting:
+python analysis/type_stratified_vader.py
+Output:
+
+data/outputs/type_stratified_vader.csv
+
+This module reports type-specific mean differences, paired t-tests, and
+Wilcoxon signed-rank tests between Wikipedia and Grokipedia.
+
+Step 6: Qualitative Bias Localization (Biographies)
+
+To localize divergence within articles, paragraph-level evidence is extracted
+from biographies:
+python analysis/biography_topk_paragraph_diff.py
+Output:
+
+data/outputs/biography_topk_negative_paragraphs.json
+
+This file highlights Top-K paragraphs exhibiting the largest sentiment gaps,
+enabling qualitative inspection of narrative framing differences.
+
+Reproducibility Notes
+
+Generated data (data/outputs, data/indices, data/cache) are excluded via .gitignore.
+
+All analyses are deterministic given fixed indices.
+
+The original seed-based pipeline remains available for reference but is no longer required.
