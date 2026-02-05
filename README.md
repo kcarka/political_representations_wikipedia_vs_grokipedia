@@ -161,20 +161,23 @@ python -m pair_discovery.build_pairs_index `
   --limit 120 `
   --out data\indices\index_bio.jsonl `
   --manifest data\indices\manifest_bio.json
+```
 
 Example: discovering legal domain articles
-
+```powershell
 python -m pair_discovery.build_pairs_index `
   --category "Category:United States constitutional law" `
   --limit 120 `
   --out data\indices\index_law.jsonl `
   --manifest data\indices\manifest_law.json
+```
 Equivalent commands can be run for institutions and events.
 
 Step 2: Merge Indices with Type-Balanced Quotas
 
 To avoid dominance by any single article type, discovered indices are merged
 using quota-based stratification:
+```powershell
 python -m pair_discovery.merge_and_quota_index `
   --bio data\indices\index_bio.jsonl `
   --inst data\indices\index_inst.jsonl `
@@ -183,27 +186,32 @@ python -m pair_discovery.merge_and_quota_index `
   --quota 30 `
   --out data\indices\pairs_index_balanced.jsonl `
   --manifest data\indices\manifest_balanced.json
+```
 This produces a balanced index suitable for cross-type comparison.
 
 Step 3: Export Paired Seeds and Scrape Articles
 
 The balanced index is converted into paired URLs and used to fetch articles
 from both platforms:
+```powershell
 python -m pair_discovery.export_seeds_from_index `
   --index data\indices\pairs_index_balanced.jsonl `
   --out_dir data\seeds `
   --max_pairs 0
 
 python run_pipeline.py
+```
 This step downloads raw HTML and parses article content and structure.
 
 Step 4: Build Paragraph-Level Paired Dataset
 
 Parsed articles are aligned into paragraph-level pairs:
+```powershell
 python -m pair_discovery.build_pairs_dataset `
   --meta data\seeds\pairs_meta.jsonl `
   --outputs_dir data\outputs `
   --out data\outputs\pairs_dataset.jsonl
+```
 Each entry contains:
 
 article title
@@ -219,11 +227,13 @@ paragraph position
 Step 5: Type-Stratified Sentiment Analysis
 
 Sentiment scores are computed using VADER and compared in a paired setting:
+```
 python analysis/type_stratified_vader.py
+```
 Output:
-
+```
 data/outputs/type_stratified_vader.csv
-
+```
 This module reports type-specific mean differences, paired t-tests, and
 Wilcoxon signed-rank tests between Wikipedia and Grokipedia.
 
@@ -231,11 +241,13 @@ Step 6: Qualitative Bias Localization (Biographies)
 
 To localize divergence within articles, paragraph-level evidence is extracted
 from biographies:
+```
 python analysis/biography_topk_paragraph_diff.py
+```
 Output:
-
+```
 data/outputs/biography_topk_negative_paragraphs.json
-
+```
 This file highlights Top-K paragraphs exhibiting the largest sentiment gaps,
 enabling qualitative inspection of narrative framing differences.
 
