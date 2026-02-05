@@ -13,6 +13,7 @@ This repository implements a comparative analysis methodology for assessing poli
   - [Synthesis and Research Question Mapping](#6-synthesis-and-research-question-mapping)
 - [Installation Instructions](#installation-instructions)
  - [Pipeline Quickstart](#pipeline-quickstart)
+ - [Installation Instructions](#Installation Instructions)
 
 ## Research Questions
 
@@ -137,7 +138,7 @@ python -m pair_discovery.merge_and_quota_index `
 ```
 This produces a balanced index suitable for cross-type comparison.
 
-### Step 3: Export Paired Seeds and Scrape Articles
+### Step 1: Export Paired Seeds and Scrape Articles
 
 The balanced index is converted into paired URLs and used to fetch articles
 from both platforms:
@@ -151,7 +152,7 @@ python run_pipeline.py
 ```
 This step downloads raw HTML and parses article content and structure.
 
-### Step 4: Build Paragraph-Level Paired Dataset
+### Step 2: Build Paragraph-Level Paired Dataset
 
 Parsed articles are aligned into paragraph-level pairs:
 ```powershell
@@ -162,7 +163,7 @@ python -m pair_discovery.build_pairs_dataset `
 ```
 Each entry contains: article title、semantic type、source platform、paragraph text、paragraph position
 
-### Step 5: Type-Stratified Sentiment Analysis
+### Step 3: Type-Stratified Sentiment Analysis
 
 Sentiment scores are computed using VADER and compared in a paired setting:
 ```
@@ -175,7 +176,7 @@ data/outputs/type_stratified_vader.csv
 This module reports type-specific mean differences, paired t-tests, and
 Wilcoxon signed-rank tests between Wikipedia and Grokipedia.
 
-### Step 6: Qualitative Bias Localization (Biographies)
+### Step 4: Qualitative Bias Localization (Biographies)
 
 To localize divergence within articles, paragraph-level evidence is extracted
 from biographies:
