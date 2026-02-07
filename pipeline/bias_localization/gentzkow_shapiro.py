@@ -1,4 +1,5 @@
 import matplotlib.pyplot as plt
+from matplotlib.patches import Patch
 import numpy as np
 import pandas as pd
 from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
@@ -11,6 +12,8 @@ import zipfile
 import os
 from pathlib import Path
 import re
+
+from collections import Counter
 
 # Path of this file: pipeline/bias_localization/gentzkow_shapiro.py
 CURRENT_FILE = Path(__file__).resolve()
@@ -78,8 +81,8 @@ def import_extract_Congress_Record_vocabulary():
     max_ideology = max(ideologies)
     mean_ideology = np.mean(ideologies)
     std_ideology = np.std(ideologies)
-    ideologies = [(i - mean_ideology) / std_ideology for i in ideologies] # z-score
-    #ideologies = [(ideology - min_ideology) / (max_ideology - min_ideology) * 2 - 1 for ideology in ideologies] # min-max normalization
+    #ideologies = [(i - mean_ideology) / std_ideology for i in ideologies] # z-score
+    ideologies = [(ideology - min_ideology) / (max_ideology - min_ideology) * 2 - 1 for ideology in ideologies] # min-max normalization
     # Create dataframe
     data = {
         "phrases": phrases,
@@ -172,17 +175,21 @@ def estimate_ideology_entity(df_entity):
     - bias : Ideology estimation for the entity.
     - orientation: Political party conclusion for the entity.
     """
-    bias = np.dot(df_entity['relative_frequency'], df_entity['score'])/ sum(df_entity['relative_frequency'])
-    orientation = "Neutral"
+    # If df_entity is empty, there are no partisanship bigrams, so the entity is neutral
+    if df_entity.empty:
+        bias = 0
+    else:
+        bias = np.dot(df_entity['relative_frequency'], df_entity['score'])/ sum(df_entity['relative_frequency'])
+    return bias
+
+def estimate_orientation_entity(bias):
     if bias > 0:
-        print("Right-leaning bias - more Republican oriented entity.")
         orientation = "Republican"
     elif bias == 0:
-        print("Neutral entity.")
+        orientation = "Neutral"
     else:
-        print("Left-leaning bias - more Democrat oriented entity.")
         orientation = "Democrat"
-    return bias, orientation
+    return orientation
 
 def ideology_color(x):
     """
@@ -198,6 +205,7 @@ def ideology_color(x):
     else:
         return "gray"   # Neutral
 
+
 def plot_distribution_congress(df_congress):
     """
     Visualize the distribution of ideological score in the Congressional Records' vocabulary.
@@ -209,12 +217,20 @@ def plot_distribution_congress(df_congress):
     """
     colors = df_congress["ideologies"].apply(ideology_color)
     x = np.arange(len(df_congress))
+    legend_elements = [
+        Patch(facecolor="blue", label="Republican"),
+        Patch(facecolor="gray", label="Neutral"),
+        Patch(facecolor="red", label="Democrat")
+    ]
+
+
     plt.figure()
     plt.scatter(x, df_congress["ideologies"], c=colors, alpha=0.6)
     plt.axhline(0)
     plt.xlabel("Bigrams (vocabulary index)")
     plt.ylabel("Ideology score")
-    plt.title("Distribution of Bigrams by Political Ideology")
+    plt.title("Distribution of Congressional Records' Bigrams by Political Ideology")
+    plt.legend(handles = legend_elements)
     plt.show()
 
     plt.figure()
@@ -222,27 +238,46 @@ def plot_distribution_congress(df_congress):
     plt.axvline(0)
     plt.xlabel("Ideology score")
     plt.ylabel("Number of bigrams")
-    plt.title("Ideological Distribution of Congressional Bigrams")
+    plt.title("Ideological Distribution of Congressional Records' Bigrams")
     plt.show()
 
-def plot_distribution_entity(df_entity, entity_name = ""):
+
+def plot_distribution_entity(df_entity, entity_name = "", unity = "Bigrams"):
+    """
+    Visualize the distribution of ideological score of the entity.
+
+    Input:
+    - DataFrame must contain at least the column 'score' for each bigrams.
+    - entity_name: corpus, article, paragraph, sentence. Entity for which the bias is considered.
+    - unity: bigrams, paragraph, sentence. Unity of measure of the bias.
+
+    Output: void 
+    """
     colors = df_entity["score"].apply(ideology_color)
     x = np.arange(len(df_entity))
+    legend_elements = [
+        Patch(facecolor="blue", label="Republican"),
+        Patch(facecolor="gray", label="Neutral"),
+        Patch(facecolor="red", label="Democrat")
+    ]
+
     plt.figure()
     plt.scatter(x, df_entity["score"], c=colors, alpha=0.6)
     plt.axhline(0)
-    plt.xlabel("Bigrams (vocabulary index)")
+    plt.xlabel(unity)
     plt.ylabel("Ideology score")
-    plt.title(f"Distribution of {entity_name} Bigrams by Political Ideology")
+    plt.title(f"Distribution of {entity_name} {unity} by Political Ideology")
+    plt.legend(handles = legend_elements)
     plt.show()
 
     plt.figure()
     plt.hist(df_entity["score"], bins=50)
     plt.axvline(0)
     plt.xlabel("Ideology score")
-    plt.ylabel("Number of bigrams")
-    plt.title(f"Ideological Distribution of {entity_name} Bigrams")
+    plt.ylabel(f"Number of {unity}")
+    plt.title(f"Ideological Distribution of {entity_name} {unity}")
     plt.show()
+
     return
 
 
@@ -277,29 +312,52 @@ def main():
     
     # Test corpus
     df_corpus = preprocessing_entity(content_corpus, df_congress)
-    print(df_corpus.head())
-    print("Number of bigrams:", df_corpus["phrases"].shape)
-    bias, orientation = estimate_ideology_entity(df_corpus)
+    #print(df_corpus.head())
+    #print("Number of bigrams:", df_corpus["phrases"].shape)
+    bias = estimate_ideology_entity(df_corpus)
     plot_distribution_entity(df_corpus, entity_name="Corpus")
+    print(f"The corpus is more {estimate_orientation_entity(bias)} (bias = {bias})")
 
     # Test article-level
     df_article = preprocessing_entity(content_article, df_congress)
-    print(df_article.head())
-    print("Number of bigrams:", df_article["phrases"].shape)
-    bias, orientation = estimate_ideology_entity(df_article)
+    #print(df_article.head())
+    #print("Number of bigrams:", df_article["phrases"].shape)
+    bias = estimate_ideology_entity(df_article)
     plot_distribution_entity(df_article, entity_name="Article")
+    print(f"The article is more {estimate_orientation_entity(bias)} (bias = {bias})")
 
     # Test paragraph-level
-    df_paragraph = [ preprocessing_entity(paragraph, df_congress) for paragraph in content_paragraph]
-    print("Paragraph | Number of bigrams \n")
-    for i, p in enumerate(df_paragraph):
-        print(f"    {i}    |   {p["phrases"].shape}")
+    print("Paragraph |  Number of bigrams  |  Ideology estimation  | Orientation\n")
+    bias_paragraphs = []
+    for i, paragraph in enumerate(content_paragraph):
+        paragraph_preprocess = preprocessing_entity(paragraph, df_congress)
+        bias = estimate_ideology_entity(paragraph_preprocess)
+        bias_paragraphs.append(bias)
+        if i < 6:
+            orientation = estimate_orientation_entity(bias)
+            print(f"    {i}    |   {paragraph_preprocess["phrases"].shape}  |     {bias:.2F}    |  {orientation}")
+    df_paragraphs = pd.DataFrame({
+        "score": bias_paragraphs
+    })
+    plot_distribution_entity(df_paragraphs, "Mean Paragraph", "Paragraphs")
+    print(f"Paragraphs are more {estimate_orientation_entity(np.mean(bias_paragraphs))} (Mean bias = {np.mean(bias_paragraphs)})")
+
 
     # Test sentence-level
-    df_sentence = [ preprocessing_entity(sentence, df_congress) for sentence in content_sentence]
-    print("Sentence | Number of bigrams \n")
-    for i, s in enumerate(df_sentence):
-        print(f"    {i}    |   {s["phrases"].shape}")
+    print("Sentence | Number of bigrams  |  Ideology estimation  | Orientation\n")
+    bias_sentences = []
+    for i, sentence in enumerate(content_sentence):
+        sentence_preprocess = preprocessing_entity(sentence, df_congress)
+        bias = estimate_ideology_entity(sentence_preprocess)
+        bias_sentences.append(bias)
+        if i < 6:
+            orientation = estimate_orientation_entity(bias)
+            print(f"    {i}    |   {sentence_preprocess["phrases"].shape}  |     {bias:.2F}    |  {orientation}")
+    df_sentences = pd.DataFrame({
+        "score": bias_sentences
+    })
+    plot_distribution_entity(df_sentences, "Mean Sentence", "Sentences")
+    print(f"Sentences are more {estimate_orientation_entity(np.mean(bias_sentences))} (Mean bias = {np.mean(bias_sentences)})")
 
 if __name__ == "__main__":
     main()
